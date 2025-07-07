@@ -1,0 +1,27 @@
+.page-layout {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem 0;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  font-size: 1.2rem;
+  color: #6b7280;
+}
+
+.page-status.error {
+  color: #dc2626;
+}
+
+@media (max-width: 1024px) {
+  .page-layout {
+    flex-direction: column;
+    padding: 1rem;
+  }
+}

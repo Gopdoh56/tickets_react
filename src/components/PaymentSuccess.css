@@ -1,0 +1,213 @@
+/* ===================================================================
+ * FILE: payment-success.css
+ * DESC: Styles for the payment success page and ticket display.
+ * =================================================================== */
+
+.payment-success-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.success-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 40px 20px;
+  /* Using Secondary color for the success header */
+  background: #03B5AA;
+  color: white;
+  border-radius: 12px;
+}
+
+.success-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.success-header h1 {
+  margin: 0 0 10px 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.success-header p {
+  margin: 0;
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.tickets-section {
+  margin-bottom: 40px;
+}
+
+.tickets-section h2 {
+  color: white;
+  margin-bottom: 30px;
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+.tickets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 30px;
+}
+
+.ticket-card {
+  /* Applying the glassy dark theme card style */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: none;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.ticket-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ticket-header {
+  border-bottom: 2px dashed rgba(255, 255, 255, 0.2);
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.ticket-header h3 {
+  margin: 0 0 8px 0;
+  color: white;
+  font-size: 1.3rem;
+}
+
+.ticket-type {
+  /* Using Accent color for ticket type */
+  background: #FF8552;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.ticket-details {
+  margin-bottom: 25px;
+}
+
+.ticket-details p {
+  margin: 8px 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+}
+
+.status-active {
+  /* Using Secondary color for active status */
+  color: #03B5AA;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.qr-code-section {
+  text-align: center;
+  background: rgba(0, 0, 0, 0.2); /* Darker inset background */
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.qr-code-section h4 {
+  margin: 0 0 15px 0;
+  color: white;
+}
+
+.qr-code {
+  max-width: 150px;
+  height: auto;
+  border: 2px solid white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.qr-instructions {
+  margin: 10px 0 0 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+.ticket-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.btn-print, .btn-email {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-print {
+  background: #03B5AA;
+  color: white;
+}
+
+.btn-print:hover {
+  background: #02948A;
+}
+
+.btn-email {
+  background: #FF8552;
+  color: white;
+}
+
+.btn-email:hover {
+  background: #E6784A;
+}
+
+.success-footer {
+  text-align: center;
+  padding: 30px;
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.success-footer p {
+  margin: 0 0 20px 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.btn-home {
+  background: #FF8552;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-home:hover {
+  background: #E6784A;
+}
+
+@media (max-width: 768px) {
+  .tickets-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .success-header h1 {
+    font-size: 2rem;
+  }
+  
+  .ticket-actions {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,128 @@
+/* ===================================================================
+ * FILE: header.css
+ * DESC: Styles for the main site header and navigation bar.
+ * =================================================================== */
+
+.header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(2, 52, 54, 0.3); /* Subtle dark background for header */
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo-icon {
+  width: 2rem;
+  height: 2rem;
+  /* Using Accent color for the logo */
+  background: #FF8552;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.logo-text {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: white;
+}
+
+.nav {
+  display: none;
+  align-items: center;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .nav {
+    display: flex;
+  }
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: white;
+}
+
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+
+/* src/components/Header.css */
+
+/* ... your existing styles for .header, .logo, .nav, etc. ... */
+
+.header-content {
+  /* Use flexbox to align everything in a row */
+  display: flex;
+  justify-content: space-between; /* Pushes items to the ends */
+  align-items: center;
+  width: 100%;
+}
+
+.nav {
+  /* This will push the nav to the center if space allows */
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+}
+
+
+
+/* A generic button style you can reuse */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Secondary button style for the recovery link */
+.btn.btn-secondary {
+  background-color: transparent;
+  border: 1px solid #6a1b9a; /* Use your theme color */
+  color: #6a1b9a;
+}
+
+.btn.btn-secondary:hover {
+  background-color: #6a1b9a;
+  color: white;
+}
+
+/* --- Responsive styles for mobile --- */
+@media (max-width: 768px) {
+  .nav {
+    display: none; /* Hide the main nav links on small screens */
+  }
+
+  /* You could add a hamburger menu icon here in the future */
+}

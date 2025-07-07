@@ -1,0 +1,74 @@
+/* ===================================================================
+ * FILE: categories.css
+ * DESC: Styles for the categories section and category cards.
+ * =================================================================== */
+
+.categories {
+  padding: 4rem 0;
+}
+
+.categories-title {
+  font-size: 1.875rem;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .categories-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.category-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.category-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.category-content {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.category-icon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem auto;
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.category-card:hover .category-icon {
+  transform: scale(1.1);
+}
+
+/* Using the new palette for category icons */
+.category-icon.purple { background: #FF8552; } /* Was purple, now Accent */
+.category-icon.blue { background: #03B5AA; }   /* Was blue, now Secondary */
+.category-icon.green { background: #03B5AA; }  /* Was green, now Secondary */
+.category-icon.red { background: #FF8552; }    /* Was red, now Accent */
+
+.category-name {
+  color: white;
+  font-weight: 600;
+  margin: 0;
+}

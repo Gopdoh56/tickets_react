@@ -1,0 +1,169 @@
+/* src/components/TicketCard.css */
+.ticket-visual {
+  width: 700px;
+  height: 300px;
+  display: flex;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: white;
+  color: #333;
+  margin: 20px auto;
+}
+
+.ticket-left {
+  width: 40%;
+  position: relative;
+  color: white;
+}
+
+.event-image-background {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.event-details-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+}
+
+.event-title-on-image {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.event-venue-on-image {
+  margin: 5px 0 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.ticket-right {
+  width: 60%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  position: relative; /* Needed for absolute positioning of QR code */
+}
+
+/* --- LAYOUT ADJUSTMENTS START HERE --- */
+
+.ticket-header-right {
+  text-align: left; /* Align to left for a cleaner look */
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.ticket-header-right h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #6a1b9a;
+}
+
+.ticket-price {
+  font-size: 14px;
+  color: #555;
+  margin-top: 4px;
+}
+
+.ticket-body-right {
+  margin-top: 15px; /* Add some space after the header */
+}
+
+.ticket-body-right p {
+  margin: 6px 0;
+  font-size: 13px;
+}
+
+.ticket-body-right p strong {
+    color: #888;
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+/* Position the QR code at the bottom right corner */
+.ticket-qr-section {
+  position: absolute;
+  bottom: 25px;
+  right: 25px;
+}
+
+.qr-code-image {
+  /* Increase the size significantly */
+  width: 180px; 
+  height: 180px;
+  border: 4px solid white; /* Add a border to help scanners */
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.qr-placeholder {
+    width: 130px;
+    height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    color: #888;
+    font-size: 12px;
+    text-align: center;
+}
+
+
+/* src/components/TicketCard.css */
+
+/* ... (all your existing CSS for .ticket-visual, etc.) ... */
+
+
+/* --- NEW STYLES FOR THE ACTION BUTTONS --- */
+.ticket-actions {
+  display: flex;
+  justify-content: center; /* Center the buttons horizontally */
+  gap: 15px; /* Add space between the buttons */
+  margin-top: 20px; /* Add space above the buttons */
+}
+
+.download-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px; /* Space between icon and text if you add one */
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: #f0f2f5;
+  color: #333;
+}
+
+.download-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.download-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Specific styling for the PDF button */
+.download-button.pdf {
+  background-color: #e53e3e; /* A red color for PDFs */
+  color: white;
+}
+
+.download-button.pdf:hover {
+  background-color: #c53030;
+}
