@@ -102,7 +102,7 @@ const PaymentSuccess = () => {
       </div>
 
       <div className="success-footer">
-        <p>A confirmation has also been sent to your email and WhatsApp (if provided).</p>
+        <p>download your tickets if lost visit the recovery page  (if provided).</p>
         <Link to="/" className="btn-home">Explore More Events</Link>
       </div>
     </div>
