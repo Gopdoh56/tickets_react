@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import './FeaturedEvents.css';
 
 // This is the URL of your Django backend.
-const API_URL = 'http://127.0.0.1:8000';
+// CORRECT - This works for both local development and live deployment
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 const FeaturedEvents = () => {
   // Create state variables

@@ -7,8 +7,8 @@ import Footer from '../components/Footer';
 import EventDetailDisplay from '../components/EventDetailDisplay';
 import TicketSidebar from '../components/TicketSidebar';
 import './EventDetailPage.css';
-
-const API_URL = 'http://127.0.0.1:8000';
+// CORRECT - This works for both local development and live deployment
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 const EventDetailPage = () => {
   const { id } = useParams(); // Gets the event ID from the URL

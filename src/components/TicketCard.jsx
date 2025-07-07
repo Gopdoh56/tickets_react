@@ -5,7 +5,8 @@ import { toPng } from 'html-to-image';
 import jsPDF from 'jspdf'; // <-- 1. ADD THIS IMPORT
 import './TicketCard.css'; // Your CSS file for this component
 
-const API_URL = 'http://127.0.0.1:8000';
+// CORRECT - This works for both local development and live deployment
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 const TicketCard = ({ ticket }) => {
   // Create a ref that we will attach to the div we want to screenshot
