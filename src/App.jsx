@@ -5,6 +5,7 @@ import EventDetailPage from './pages/EventDetailPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import TicketRecovery from './pages/TicketRecovery'; // <-- 1. IMPORT THE NEW 
 import MyTicketsPage from './pages/MyTicketsPage';
+import AdminEventUpload from './pages/AdminEventUpload';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/payment-success" element={<PaymentSuccessPage />} /> {/* Change this */}
       <Route path="/recover-tickets" element={<TicketRecovery />} />
       <Route path="/my-tickets" element={<MyTicketsPage />} />
+      <Route path="/admin/upload" element={<AdminEventUpload />} />
     
 
 
