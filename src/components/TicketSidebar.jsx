@@ -3,16 +3,16 @@ import axios from 'axios';
 import './TicketSidebar.css';
 
 const TicketSidebar = ({ event }) => {
-  // State to hold quantities for each ticket type, e.g., { 1: 2, 2: 1 }
+  // --- THIS IS THE FIRST CHANGE ---
+  // This makes your component work in both local development and on Vercel
+  // by reading the environment variable provided by Vercel.
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  // --- END OF CHANGE ---
+
+  // State to hold quantities for each ticket type
   const [quantities, setQuantities] = useState({});
-
   // State for user's contact information
-  const [userInfo, setUserInfo] = useState({
-    name: '',
-    email: '',
-    whatsapp: ''
-  });
-
+  const [userInfo, setUserInfo] = useState({ name: '', email: '', whatsapp: '' });
   // State for loading and error messages
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -21,16 +21,11 @@ const TicketSidebar = ({ event }) => {
   const handleQuantityChange = (ticketTypeId, change) => {
     const currentQuantity = quantities[ticketTypeId] || 0;
     const newQuantity = currentQuantity + change;
-    
     const ticketType = event.ticket_types.find(t => t.id === ticketTypeId);
     if (!ticketType) return;
 
-    // Ensure quantity is within valid range (0 to available)
     if (newQuantity >= 0 && newQuantity <= ticketType.available_quantity) {
-      setQuantities(prev => ({
-        ...prev,
-        [ticketTypeId]: newQuantity
-      }));
+      setQuantities(prev => ({ ...prev, [ticketTypeId]: newQuantity }));
     }
   };
 
@@ -57,10 +52,10 @@ const TicketSidebar = ({ event }) => {
     return { totalItems: items, totalPrice: price };
   }, [quantities, event.ticket_types]);
 
-  // Define your service fee in Kwacha here
+  // Define your service fee
   const serviceFee = 500.00;
 
-  // The purchase handler is now an async function to handle the API call
+  // The purchase handler now uses the dynamic API_URL
   const handlePurchase = async () => {
     if (totalItems === 0) {
       alert("Please select at least one ticket.");
@@ -85,24 +80,18 @@ const TicketSidebar = ({ event }) => {
     };
 
     try {
-      // =================================================================
-      // === THE ONLY CHANGE IS THIS ONE LINE: ===========================
-      //
-      // Save the user's email to the browser's local storage.
-      // Your PaymentSuccess.jsx page will read this value after the redirect.
       localStorage.setItem('purchaser_email', userInfo.email);
-      //
-      // =================================================================
 
-      // Make the API call to your Django backend
+      // --- THIS IS THE SECOND CHANGE ---
+      // The hardcoded 'localhost' URL has been replaced with the API_URL variable.
       const response = await axios.post(
-        'http://localhost:8000/api/payments/initiate-payment/', 
+        `${API_URL}/api/payments/initiate-payment/`, 
         purchaseDetails
       );
+      // --- END OF CHANGE ---
       
       const { payment_url } = response.data;
 
-      // If we get a payment URL, redirect the user to it
       if (payment_url) {
         window.location.href = payment_url;
       } else {
@@ -110,8 +99,7 @@ const TicketSidebar = ({ event }) => {
       }
 
     } catch (err) {
-      // Handle errors from the backend gracefully
-      const errorMessage = err.response?.data?.error || 'An unexpected error occurred. Please try again.';
+      const errorMessage = err.response?.data?.error || 'An unexpected error occurred during payment initiation.';
       setError(errorMessage);
       console.error("Purchase error:", err);
     } finally {
