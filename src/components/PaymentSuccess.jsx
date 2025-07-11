@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Link, useSearchParams } from 'react-router-dom';
-import TicketCard from '../components/TicketCard';
+import TicketCard from '../components/TicketCard'; // Import the self-sufficient component
 import './PaymentSuccess.css'; 
 
 const PaymentSuccess = () => {
@@ -13,6 +13,7 @@ const PaymentSuccess = () => {
   const [message, setMessage] = useState('Verifying your payment...');
   
   const hasFetched = useRef(false);
+
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
   useEffect(() => {
@@ -35,11 +36,11 @@ const PaymentSuccess = () => {
           
           const userEmail = verifyResponse.data.email;
 
-          // --- THIS IS THE FIX ---
+          // --- THIS IS THE ONLY CHANGE ---
           // We add '&order_id=${txRef}' to the end of the URL.
-          // This tells the backend to fetch tickets ONLY for this specific transaction.
+          // This tells the backend to fetch tickets only for this specific transaction.
           const ticketsResponse = await axios.get(`${API_URL}/api/payments/user-tickets/?email=${userEmail}&order_id=${txRef}`);
-          // --- END OF FIX ---
+          // --- END OF CHANGE ---
           
           setTickets(ticketsResponse.data.tickets || []);
           setVerificationStatus('success');
@@ -58,7 +59,8 @@ const PaymentSuccess = () => {
     verifyAndFetch();
   }, [searchParams, API_URL]);
 
-  // --- RENDER LOGIC (No changes needed here) ---
+  // --- RENDER LOGIC ---
+
   if (verificationStatus === 'verifying') {
     return (
       <div className="payment-status-container">
@@ -85,8 +87,9 @@ const PaymentSuccess = () => {
         <h1>Payment Successful!</h1>
         <p>{message}</p>
       </div>
+
       <div className="tickets-section">
-        <h2>Your Tickets For This Order ({tickets.length})</h2>
+        <h2>Your Tickets ({tickets.length})</h2>
         <div className="tickets-grid-display">
           {tickets.length > 0 ? (
             tickets.map((ticket) => (
@@ -97,10 +100,9 @@ const PaymentSuccess = () => {
           )}
         </div>
       </div>
+
       <div className="success-footer">
-        <p>Your tickets are ready. Please download them for your records.</p>
-        <Link to="/recover-tickets" className="link">Lost your tickets? Recover them here.</Link>
-        <br />
+        <p>download your tickets if lost visit the recovery page  (if provided).</p>
         <Link to="/" className="btn-home">Explore More Events</Link>
       </div>
     </div>
