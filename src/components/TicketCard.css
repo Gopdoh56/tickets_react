@@ -1,6 +1,16 @@
 /* src/components/TicketCard.css */
+
+/* Base container styles */
+.ticket-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
 .ticket-visual {
-  width: 700px;
+  width: 100%;
+  max-width: 700px;
   height: 300px;
   display: flex;
   font-family: 'Poppins', sans-serif;
@@ -16,6 +26,7 @@
   width: 40%;
   position: relative;
   color: white;
+  min-width: 200px;
 }
 
 .event-image-background {
@@ -50,13 +61,12 @@
   padding: 20px;
   display: flex;
   flex-direction: column;
-  position: relative; /* Needed for absolute positioning of QR code */
+  position: relative;
+  min-width: 300px;
 }
 
-/* --- LAYOUT ADJUSTMENTS START HERE --- */
-
 .ticket-header-right {
-  text-align: left; /* Align to left for a cleaner look */
+  text-align: left;
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
 }
@@ -74,7 +84,7 @@
 }
 
 .ticket-body-right {
-  margin-top: 15px; /* Add some space after the header */
+  margin-top: 15px;
 }
 
 .ticket-body-right p {
@@ -83,13 +93,12 @@
 }
 
 .ticket-body-right p strong {
-    color: #888;
-    display: block;
-    font-size: 11px;
-    text-transform: uppercase;
+  color: #888;
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
 }
 
-/* Position the QR code at the bottom right corner */
 .ticket-qr-section {
   position: absolute;
   bottom: 25px;
@@ -97,44 +106,41 @@
 }
 
 .qr-code-image {
-  /* Increase the size significantly */
-  width: 180px; 
+  width: 180px;
   height: 180px;
-  border: 4px solid white; /* Add a border to help scanners */
+  border: 4px solid white;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 .qr-placeholder {
-    width: 130px;
-    height: 130px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f0f0f0;
-    color: #888;
-    font-size: 12px;
-    text-align: center;
+  width: 130px;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  color: #888;
+  font-size: 12px;
+  text-align: center;
 }
 
-
-/* src/components/TicketCard.css */
-
-/* ... (all your existing CSS for .ticket-visual, etc.) ... */
-
-
-/* --- NEW STYLES FOR THE ACTION BUTTONS --- */
+/* RESPONSIVE DOWNLOAD BUTTONS */
 .ticket-actions {
   display: flex;
-  justify-content: center; /* Center the buttons horizontally */
-  gap: 15px; /* Add space between the buttons */
-  margin-top: 20px; /* Add space above the buttons */
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+  padding: 0 20px;
+  flex-wrap: wrap; /* Allow buttons to wrap on very small screens */
 }
 
 .download-button {
   display: inline-flex;
   align-items: center;
-  gap: 8px; /* Space between icon and text if you add one */
-  padding: 10px 20px;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -144,6 +150,9 @@
   transition: all 0.2s ease-in-out;
   background-color: #f0f2f5;
   color: #333;
+  min-width: 140px; /* Ensure consistent button width */
+  text-align: center;
+  white-space: nowrap;
 }
 
 .download-button:hover {
@@ -158,12 +167,160 @@
   box-shadow: none;
 }
 
-/* Specific styling for the PDF button */
 .download-button.pdf {
-  background-color: #e53e3e; /* A red color for PDFs */
+  background-color: #e53e3e;
   color: white;
 }
 
 .download-button.pdf:hover {
   background-color: #c53030;
+}
+
+/* RESPONSIVE DESIGN */
+
+/* Large tablets and small desktops */
+@media (max-width: 768px) {
+  .ticket-container {
+    padding: 0 15px;
+  }
+  
+  .ticket-visual {
+    height: 280px;
+    margin: 15px auto;
+  }
+  
+  .event-title-on-image {
+    font-size: 20px;
+  }
+  
+  .ticket-header-right h3 {
+    font-size: 18px;
+  }
+  
+  .qr-code-image {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .ticket-actions {
+    gap: 12px;
+    margin-top: 15px;
+  }
+  
+  .download-button {
+    padding: 10px 20px;
+    font-size: 13px;
+    min-width: 120px;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .ticket-container {
+    padding: 0 10px;
+  }
+  
+  .ticket-visual {
+    flex-direction: column;
+    height: auto;
+    max-width: 100%;
+    margin: 10px auto;
+  }
+  
+  .ticket-left {
+    width: 100%;
+    height: 200px;
+    min-width: unset;
+  }
+  
+  .ticket-right {
+    width: 100%;
+    min-width: unset;
+    padding: 15px;
+  }
+  
+  .event-title-on-image {
+    font-size: 18px;
+  }
+  
+  .event-venue-on-image {
+    font-size: 12px;
+  }
+  
+  .ticket-header-right h3 {
+    font-size: 16px;
+  }
+  
+  .ticket-body-right p {
+    font-size: 12px;
+  }
+  
+  .ticket-qr-section {
+    position: static;
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+  }
+  
+  .qr-code-image {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .qr-placeholder {
+    width: 100px;
+    height: 100px;
+    font-size: 10px;
+  }
+  
+  .ticket-actions {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+    align-items: stretch;
+  }
+  
+  .download-button {
+    width: 100%;
+    min-width: unset;
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 320px) {
+  .ticket-container {
+    padding: 0 5px;
+  }
+  
+  .ticket-visual {
+    border-radius: 8px;
+  }
+  
+  .event-details-overlay {
+    padding: 15px;
+  }
+  
+  .ticket-right {
+    padding: 12px;
+  }
+  
+  .event-title-on-image {
+    font-size: 16px;
+  }
+  
+  .ticket-header-right h3 {
+    font-size: 14px;
+  }
+  
+  .qr-code-image {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .download-button {
+    padding: 10px;
+    font-size: 13px;
+  }
 }

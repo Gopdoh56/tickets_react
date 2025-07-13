@@ -1,6 +1,6 @@
 /* ===================================================================
- * FILE: events.css
- * DESC: Styles for the featured events section and event cards.
+ * FILE: FeaturedEvents.css
+ * DESC: Improved styles for the featured events section and event cards.
  * =================================================================== */
 
 .featured-events {
@@ -24,7 +24,6 @@
 .view-all-btn {
   padding: 0.5rem 1rem;
   background: transparent;
-  /* Using Accent color for the border */
   border: 1px solid #FF8552;
   color: white;
   border-radius: 0.375rem;
@@ -33,7 +32,6 @@
 }
 
 .view-all-btn:hover {
-  /* Using Accent color with transparency for hover */
   background: rgba(255, 133, 82, 0.2);
 }
 
@@ -58,13 +56,14 @@
 .event-card {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid hsl(0, 0%, 100%);
   border-radius: 0.75rem;
   overflow: hidden;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 380px;
 }
 
 .event-card:hover {
@@ -76,77 +75,87 @@
   text-decoration: none;
   color: inherit;
   display: block;
+  height: 100%;
 }
 
+/* PERFECT IMAGE CONTAINER - IMPROVED */
 .event-image-container {
   position: relative;
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+  /* Ensure no gaps or spacing issues */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* PERFECT IMAGE STYLING - IMPROVED */
 .event-image {
   width: 100%;
-  height: 12rem;
+  height: 100%;
   object-fit: cover;
+  object-position: center;
   transition: transform 0.3s ease;
+  display: block;
+  /* Ensure image covers the entire container */
+  min-width: 100%;
+  min-height: 100%;
+  /* Remove any default margins or padding */
+  margin: 0;
+  padding: 0;
+  /* Ensure crisp rendering */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: optimize-contrast;
+  image-rendering: crisp-edges;
+  /* Fallback for older browsers */
+  -ms-interpolation-mode: bicubic;
 }
 
 .event-card:hover .event-image {
   transform: scale(1.05);
 }
 
-.event-badge {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  /* Using Secondary color for badges */
-  background: #03B5AA;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.event-rating {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  border-radius: 1rem;
-  padding: 0.25rem 0.5rem;
+/* Fallback for images that fail to load */
+.event-image[src*="placeholder"] {
+  background: linear-gradient(135deg, rgba(255, 133, 82, 0.2), rgba(3, 181, 170, 0.2));
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  color: white;
+  justify-content: center;
   font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
 }
 
-.star-icon {
-  color: #fbbf24;
-}
-
+/* IMPROVED CONTENT SECTION */
 .event-content {
-  padding: 1.5rem;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
 }
 
 .event-title {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: bold;
   color: white;
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.75rem 0;
   transition: color 0.3s ease;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .event-card:hover .event-title {
-  /* Using Secondary color for hover effect on title */
   color: #03B5AA;
 }
 
+/* COMPACT EVENT DETAILS */
 .event-details {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   flex-grow: 1;
 }
 
@@ -154,14 +163,15 @@
   display: flex;
   align-items: center;
   color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
+  margin-bottom: 0.375rem;
+  font-size: 0.8rem;
 }
 
 .detail-icon {
-  margin-right: 0.5rem;
-  width: 1rem;
-  height: 1rem;
+  margin-right: 0.375rem;
+  width: 0.875rem;
+  height: 0.875rem;
+  flex-shrink: 0;
 }
 
 .event-footer {
@@ -169,16 +179,17 @@
   align-items: center;
   justify-content: space-between;
   margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .event-price {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: bold;
   color: white;
 }
 
 .get-tickets-btn {
-  /* Using Accent color for the main CTA */
   background: #FF8552;
   color: white;
   border: none;
@@ -188,9 +199,110 @@
   font-weight: 500;
   transition: all 0.3s ease;
   text-align: center;
+  font-size: 0.875rem;
 }
 
 .get-tickets-btn:hover {
-  /* Darker shade of Accent for hover */
   background: #E6784A;
+  transform: translateY(-1px);
+}
+
+/* RESPONSIVE IMPROVEMENTS */
+@media (max-width: 768px) {
+  .event-card {
+    min-height: 340px;
+  }
+  
+  .event-image-container {
+    height: 200px;
+  }
+  
+  .event-content {
+    padding: 1rem;
+  }
+  
+  .event-title {
+    font-size: 1rem;
+  }
+  
+  .event-price {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .featured-events-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .event-card {
+    min-height: 320px;
+  }
+  
+  .event-image-container {
+    height: 180px;
+  }
+  
+  .event-content {
+    padding: 0.875rem;
+  }
+  
+  .event-detail {
+    font-size: 0.75rem;
+  }
+  
+  .get-tickets-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* LOADING AND ERROR STATES */
+.loading-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.125rem;
+}
+
+.error-message {
+  color: #ff6b6b;
+  text-align: center;
+  padding: 2rem;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+/* ADDITIONAL IMAGE OPTIMIZATION */
+.event-image-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 133, 82, 0.1), rgba(3, 181, 170, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.event-card:hover .event-image-container::before {
+  opacity: 1;
+}
+
+/* Ensure images always fill the container perfectly */
+.event-image-container img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }

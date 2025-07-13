@@ -1,58 +1,86 @@
-/* ===================================================================
- * FILE: categories.css
- * DESC: Styles for the categories section and category cards.
- * =================================================================== */
+/* src/components/Categories.css - Updated for a more compact and modern look */
 
 .categories {
-  padding: 4rem 0;
+  /* Make the section shorter vertically */
+  padding: 3rem 0;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.categories-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
 }
 
 .categories-title {
-  font-size: 1.875rem;
-  font-weight: bold;
+  font-size: 2.25rem; /* A bit larger for emphasis */
+  font-weight: 700;
   color: white;
-  text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.search-bar-wrapper {
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.event-search-input {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 50px; /* Pill shape */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.1);
+  color: #f0f0f0;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.event-search-input::placeholder {
+  color: #888;
+}
+
+.event-search-input:focus {
+  border-color: #FF8552; /* Your accent color */
+  box-shadow: 0 0 0 4px rgba(255, 133, 82, 0.2);
 }
 
 .categories-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-}
-
-@media (min-width: 768px) {
-  .categories-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  /* Use flexbox to create a centered, single row of items */
+  display: flex;
+  justify-content: center; /* Center the cards horizontally */
+  flex-wrap: wrap; /* Allow cards to wrap on smaller screens */
+  gap: 1.25rem; /* Space between cards */
 }
 
 .category-card {
+  /* Your existing card styles are good, just minor tweaks */
   background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  width: 150px; /* Give cards a fixed width */
+  text-align: center;
 }
 
 .category-card:hover {
   background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-4px);
 }
 
 .category-content {
-  padding: 1.5rem;
-  text-align: center;
+  padding: 1.25rem 1rem;
 }
 
 .category-icon {
-  width: 4rem;
-  height: 4rem;
+  /* Make the icon smaller and ensure it's centered */
+  width: 3.5rem; /* 56px */
+  height: 3.5rem; /* 56px */
   border-radius: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 1rem auto;
+  margin: 0 auto 1rem auto; /* `margin: auto` is key for centering */
   color: white;
   transition: transform 0.3s ease;
 }
@@ -61,14 +89,15 @@
   transform: scale(1.1);
 }
 
-/* Using the new palette for category icons */
-.category-icon.purple { background: #FF8552; } /* Was purple, now Accent */
-.category-icon.blue { background: #03B5AA; }   /* Was blue, now Secondary */
-.category-icon.green { background: #03B5AA; }  /* Was green, now Secondary */
-.category-icon.red { background: #FF8552; }    /* Was red, now Accent */
+/* Your icon color styles are perfect, no change needed */
+.category-icon.purple { background: #FF8552; }
+.category-icon.blue { background: #03B5AA; }
+.category-icon.green { background: #03B5AA; }
+.category-icon.red { background: #FF8552; }
 
 .category-name {
   color: white;
   font-weight: 600;
+  font-size: 1rem;
   margin: 0;
 }

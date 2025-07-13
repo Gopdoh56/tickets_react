@@ -1,21 +1,34 @@
-import React from 'react';
-
-// Import all your components
+import React, { useState } from 'react';
 import Header from '../components/Header';
 import Categories from '../components/Categories';
 import FeaturedEvents from '../components/FeaturedEvents';
 import Footer from '../components/Footer';
 
-// This is our main page component
 const HomePage = () => {
+  // State for the filters lives in the parent component
+  const [filters, setFilters] = useState({ search: '', category: '' });
+
+  // This function is passed down to the Categories component
+  const handleSearch = (searchTerm) => {
+    setFilters({ search: searchTerm, category: '' });
+  };
+
+  // This function is also passed down to the Categories component
+  const handleCategorySelect = (categorySlug) => {
+    setFilters({ search: '', category: categorySlug });
+  };
+
   return (
     <div>
       <Header />
       <main>
-        <Categories />
-        <FeaturedEvents />
-        
-        
+        {/* Pass the handler functions as props */}
+        <Categories 
+          onSearch={handleSearch} 
+          onCategorySelect={handleCategorySelect} 
+        />
+        {/* Pass the current filter state as a prop */}
+        <FeaturedEvents filters={filters} />
       </main>
       <Footer />
     </div>
