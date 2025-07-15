@@ -3,15 +3,15 @@
 /* Base container styles */
 .ticket-container {
   width: 100%;
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
 .ticket-visual {
   width: 100%;
-  max-width: 700px;
-  height: 300px;
+  max-width: 800px;
+  height: 280px;
   display: flex;
   font-family: 'Poppins', sans-serif;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -20,13 +20,14 @@
   background-color: white;
   color: #333;
   margin: 20px auto;
+  position: relative;
 }
 
 .ticket-left {
-  width: 40%;
+  flex: 0 0 45%;
   position: relative;
   color: white;
-  min-width: 200px;
+  overflow: hidden;
 }
 
 .event-image-background {
@@ -46,8 +47,9 @@
 
 .event-title-on-image {
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
   line-height: 1.2;
+  font-weight: 600;
 }
 
 .event-venue-on-image {
@@ -57,64 +59,75 @@
 }
 
 .ticket-right {
-  width: 60%;
+  flex: 1;
   padding: 20px;
   display: flex;
   flex-direction: column;
   position: relative;
-  min-width: 300px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
 }
 
 .ticket-header-right {
   text-align: left;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e9ecef;
+  margin-bottom: 15px;
 }
 
 .ticket-header-right h3 {
   margin: 0;
   font-size: 20px;
   color: #6a1b9a;
+  font-weight: 600;
 }
 
 .ticket-price {
-  font-size: 14px;
-  color: #555;
-  margin-top: 4px;
+  font-size: 16px;
+  color: #28a745;
+  font-weight: 600;
+  margin-top: 5px;
 }
 
 .ticket-body-right {
-  margin-top: 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .ticket-body-right p {
-  margin: 6px 0;
-  font-size: 13px;
+  margin: 0;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .ticket-body-right p strong {
-  color: #888;
-  display: block;
+  color: #6c757d;
   font-size: 11px;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
 }
 
 .ticket-qr-section {
   position: absolute;
-  bottom: 25px;
-  right: 25px;
+  bottom: 20px;
+  right: 20px;
 }
 
 .qr-code-image {
-  width: 180px;
-  height: 180px;
-  border: 4px solid white;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  width: 140px;
+  height: 140px;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 8px;
 }
 
 .qr-placeholder {
-  width: 130px;
-  height: 130px;
+  width: 140px;
+  height: 140px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -122,6 +135,7 @@
   color: #888;
   font-size: 12px;
   text-align: center;
+  border-radius: 8px;
 }
 
 /* RESPONSIVE DOWNLOAD BUTTONS */
@@ -132,7 +146,7 @@
   gap: 15px;
   margin-top: 20px;
   padding: 0 20px;
-  flex-wrap: wrap; /* Allow buttons to wrap on very small screens */
+  flex-wrap: wrap;
 }
 
 .download-button {
@@ -150,7 +164,7 @@
   transition: all 0.2s ease-in-out;
   background-color: #f0f2f5;
   color: #333;
-  min-width: 140px; /* Ensure consistent button width */
+  min-width: 140px;
   text-align: center;
   white-space: nowrap;
 }
@@ -178,28 +192,80 @@
 
 /* RESPONSIVE DESIGN */
 
-/* Large tablets and small desktops */
-@media (max-width: 768px) {
-  .ticket-container {
-    padding: 0 15px;
+/* Large tablets (768px - 1024px) */
+@media (max-width: 1024px) {
+  .ticket-visual {
+    max-width: 700px;
+    height: 260px;
   }
   
-  .ticket-visual {
-    height: 280px;
-    margin: 15px auto;
+  .ticket-left {
+    flex: 0 0 42%;
   }
   
   .event-title-on-image {
     font-size: 20px;
   }
   
+  .qr-code-image {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .qr-placeholder {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+/* Medium tablets (768px and below) */
+@media (max-width: 768px) {
+  .ticket-container {
+    padding: 0 15px;
+  }
+  
+  .ticket-visual {
+    height: 240px;
+    margin: 15px auto;
+  }
+  
+  .ticket-left {
+    flex: 0 0 40%;
+  }
+  
+  .ticket-right {
+    padding: 15px;
+  }
+  
+  .event-title-on-image {
+    font-size: 18px;
+  }
+  
+  .event-venue-on-image {
+    font-size: 12px;
+  }
+  
   .ticket-header-right h3 {
     font-size: 18px;
   }
   
+  .ticket-price {
+    font-size: 14px;
+  }
+  
+  .ticket-body-right p {
+    font-size: 13px;
+  }
+  
   .qr-code-image {
-    width: 150px;
-    height: 150px;
+    width: 100px;
+    height: 100px;
+  }
+  
+  .qr-placeholder {
+    width: 100px;
+    height: 100px;
+    font-size: 10px;
   }
   
   .ticket-actions {
@@ -214,37 +280,26 @@
   }
 }
 
-/* Mobile phones */
-@media (max-width: 480px) {
-  .ticket-container {
-    padding: 0 10px;
-  }
-  
+/* Small tablets and large phones (600px and below) */
+@media (max-width: 600px) {
   .ticket-visual {
-    flex-direction: column;
-    height: auto;
-    max-width: 100%;
-    margin: 10px auto;
+    height: 220px;
   }
   
   .ticket-left {
-    width: 100%;
-    height: 200px;
-    min-width: unset;
+    flex: 0 0 35%;
   }
   
   .ticket-right {
-    width: 100%;
-    min-width: unset;
+    padding: 12px;
+  }
+  
+  .event-details-overlay {
     padding: 15px;
   }
   
   .event-title-on-image {
-    font-size: 18px;
-  }
-  
-  .event-venue-on-image {
-    font-size: 12px;
+    font-size: 16px;
   }
   
   .ticket-header-right h3 {
@@ -253,24 +308,97 @@
   
   .ticket-body-right p {
     font-size: 12px;
+    gap: 1px;
   }
   
-  .ticket-qr-section {
-    position: static;
-    display: flex;
-    justify-content: center;
-    margin-top: 15px;
+  .ticket-body-right p strong {
+    font-size: 10px;
   }
   
   .qr-code-image {
-    width: 120px;
-    height: 120px;
+    width: 80px;
+    height: 80px;
   }
   
   .qr-placeholder {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
+    font-size: 9px;
+  }
+  
+  .ticket-qr-section {
+    bottom: 15px;
+    right: 15px;
+  }
+}
+
+/* Mobile phones (480px and below) */
+@media (max-width: 480px) {
+  .ticket-container {
+    padding: 0 10px;
+  }
+  
+  .ticket-visual {
+    height: 200px;
+    margin: 10px auto;
+  }
+  
+  .ticket-left {
+    flex: 0 0 30%;
+  }
+  
+  .ticket-right {
+    padding: 10px;
+  }
+  
+  .event-details-overlay {
+    padding: 10px;
+  }
+  
+  .event-title-on-image {
+    font-size: 14px;
+    line-height: 1.1;
+  }
+  
+  .event-venue-on-image {
     font-size: 10px;
+  }
+  
+  .ticket-header-right {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .ticket-header-right h3 {
+    font-size: 14px;
+  }
+  
+  .ticket-price {
+    font-size: 12px;
+  }
+  
+  .ticket-body-right {
+    gap: 8px;
+  }
+  
+  .ticket-body-right p {
+    font-size: 11px;
+  }
+  
+  .qr-code-image {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .qr-placeholder {
+    width: 60px;
+    height: 60px;
+    font-size: 8px;
+  }
+  
+  .ticket-qr-section {
+    bottom: 10px;
+    right: 10px;
   }
   
   .ticket-actions {
@@ -288,35 +416,46 @@
   }
 }
 
-/* Extra small screens */
+/* Extra small screens (320px and below) */
 @media (max-width: 320px) {
-  .ticket-container {
-    padding: 0 5px;
-  }
-  
   .ticket-visual {
+    height: 180px;
     border-radius: 8px;
   }
   
-  .event-details-overlay {
-    padding: 15px;
+  .ticket-left {
+    flex: 0 0 25%;
   }
   
   .ticket-right {
-    padding: 12px;
+    padding: 8px;
   }
   
   .event-title-on-image {
-    font-size: 16px;
+    font-size: 12px;
   }
   
   .ticket-header-right h3 {
-    font-size: 14px;
+    font-size: 12px;
+  }
+  
+  .ticket-price {
+    font-size: 11px;
+  }
+  
+  .ticket-body-right p {
+    font-size: 10px;
   }
   
   .qr-code-image {
-    width: 100px;
-    height: 100px;
+    width: 50px;
+    height: 50px;
+  }
+  
+  .qr-placeholder {
+    width: 50px;
+    height: 50px;
+    font-size: 7px;
   }
   
   .download-button {
