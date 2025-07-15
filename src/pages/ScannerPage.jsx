@@ -1,8 +1,8 @@
 // src/pages/ScannerPage.jsx
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, useSearchParams, Link } from 'react-router-dom';
-import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 import axios from 'axios';
 import './ScannerPage.css';
 
@@ -11,6 +11,8 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const ScannerPage = () => {
   const { eventId } = useParams();
   const [searchParams] = useSearchParams();
+  const scannerRef = useRef(null);
+  const html5QrcodeScanner = useRef(null);
   
   const [eventName, setEventName] = useState('');
   const [lastScanned, setLastScanned] = useState(null);
@@ -22,10 +24,6 @@ const ScannerPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [debugMode, setDebugMode] = useState(false);
   const [lastRawScan, setLastRawScan] = useState('');
-  const [isScanning, setIsScanning] = useState(false);
-  
-  const scannerRef = useRef(null);
-  const html5QrcodeScanner = useRef(null);
 
   const loadEventData = useCallback(async () => {
     setIsLoading(true);
@@ -42,12 +40,9 @@ const ScannerPage = () => {
     try {
       setMessage('Downloading fresh event data...');
       const apiUrl = `${API_URL}/api/tickets/valid-ids/${eventId}/?token=${token}`;
-      console.log('Attempting to fetch from:', apiUrl);
-      console.log('Event ID:', eventId);
-      console.log('Token:', token);
+      console.log('Fetching from:', apiUrl);
       
       const response = await axios.get(apiUrl);
-      
       const { event_name, valid_ticket_ids } = response.data;
       const newValidTickets = new Set(valid_ticket_ids);
       
@@ -64,17 +59,7 @@ const ScannerPage = () => {
     } catch (error) {
       console.error("API fetch failed:", error);
       
-      // More detailed error logging
-      if (error.response) {
-        console.error('Response status:', error.response.status);
-        console.error('Response data:', error.response.data);
-        console.error('Response headers:', error.response.headers);
-      } else if (error.request) {
-        console.error('Request made but no response:', error.request);
-      } else {
-        console.error('Error setting up request:', error.message);
-      }
-      
+      // Try to use stored data
       const storedData = localStorage.getItem(storageKey);
       if (storedData) {
         try {
@@ -90,20 +75,12 @@ const ScannerPage = () => {
         }
       } else {
         let errorMessage = 'Could not load data.';
-        
-        if (error.response?.status === 404) {
-          errorMessage = 'API endpoint not found. Please check your backend server.';
-        } else if (error.response?.status === 401) {
+        if (error.response?.status === 401) {
           errorMessage = 'Invalid token. Please get a new access link.';
-        } else if (error.response?.status === 403) {
-          errorMessage = 'Access denied. Please check your permissions.';
-        } else if (error.code === 'ECONNREFUSED' || error.message.includes('Network Error')) {
-          errorMessage = 'Cannot connect to server. Please check if the backend is running.';
-        } else if (error.response?.data?.error) {
-          errorMessage = error.response.data.error;
+        } else if (error.response?.status === 404) {
+          errorMessage = 'Event not found. Please check the event ID.';
         }
-        
-        setMessage(`Error: ${errorMessage} Please connect to the internet and refresh.`);
+        setMessage(`Error: ${errorMessage}`);
         setIsReady(false);
       }
     } finally {
@@ -111,212 +88,156 @@ const ScannerPage = () => {
     }
   }, [eventId, searchParams]);
 
-  // Enhanced parsing function with better QR code support
+  // Simplified ticket ID parsing
   const parseTicketId = (qrContent) => {
-    // Store raw scan for debugging
     setLastRawScan(qrContent);
-    
     console.log('Raw QR Content:', qrContent);
-    console.log('QR Content type:', typeof qrContent);
-    console.log('QR Content length:', qrContent.length);
     
-    // Method 1: Direct ticket ID (most common for simple QR codes)
-    const trimmedContent = qrContent.trim();
-    if (trimmedContent && !trimmedContent.includes('\n') && !trimmedContent.includes(' ')) {
-      console.log('Treating entire content as ticket ID:', trimmedContent);
-      return trimmedContent;
-    }
+    // Clean the content
+    const cleanContent = qrContent.trim();
     
-    // Method 2: Look for TicketID: prefix
-    const lines = qrContent.split('\n');
-    const idLine = lines.find(line => line.startsWith('TicketID:'));
-    if (idLine) {
-      const ticketId = idLine.split(':')[1]?.trim();
-      console.log('Found TicketID with prefix:', ticketId);
-      return ticketId;
-    }
-    
-    // Method 3: Check for common QR code patterns
-    const patterns = [
-      /ticket[_-]?id[:\s=]+([^\s\n]+)/i,
-      /id[:\s=]+([^\s\n]+)/i,
-      /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i, // UUID
-      /^([A-Za-z0-9]{8,})$/m, // Alphanumeric ID on its own line
-    ];
-    
-    for (const pattern of patterns) {
-      const match = qrContent.match(pattern);
-      if (match) {
-        console.log('Found ticket ID with pattern:', pattern, 'Result:', match[1] || match[0]);
-        return match[1] || match[0];
-      }
-    }
-    
-    // Method 4: Try to parse as JSON
+    // Try JSON parsing first
     try {
-      const jsonData = JSON.parse(qrContent);
-      if (jsonData.ticketId) {
-        console.log('Found ticket ID in JSON:', jsonData.ticketId);
-        return jsonData.ticketId;
-      }
-      if (jsonData.id) {
-        console.log('Found ID in JSON:', jsonData.id);
-        return jsonData.id;
-      }
-      if (jsonData.ticket_id) {
-        console.log('Found ticket_id in JSON:', jsonData.ticket_id);
-        return jsonData.ticket_id;
-      }
+      const jsonData = JSON.parse(cleanContent);
+      if (jsonData.ticketId) return jsonData.ticketId;
+      if (jsonData.id) return jsonData.id;
+      if (jsonData.ticket_id) return jsonData.ticket_id;
     } catch (e) {
-      // Not JSON, continue
+      // Not JSON, continue with other methods
     }
     
-    // Method 5: URL parsing (if QR contains a URL with ID)
-    try {
-      const url = new URL(qrContent);
-      const urlParams = new URLSearchParams(url.search);
-      const ticketId = urlParams.get('ticket_id') || urlParams.get('id') || urlParams.get('ticketId');
-      if (ticketId) {
-        console.log('Found ticket ID in URL:', ticketId);
-        return ticketId;
+    // Check for TicketID: prefix
+    if (cleanContent.includes('TicketID:')) {
+      const match = cleanContent.match(/TicketID:\s*([^\s\n]+)/);
+      if (match) return match[1];
+    }
+    
+    // Check for simple alphanumeric ID (most common case)
+    const lines = cleanContent.split('\n').map(line => line.trim()).filter(line => line);
+    
+    for (const line of lines) {
+      // Skip empty lines and common text
+      if (!line || line.toLowerCase().includes('event') || line.toLowerCase().includes('ticket')) {
+        continue;
       }
-    } catch (e) {
-      // Not a valid URL, continue
+      
+      // Look for UUID pattern
+      if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(line)) {
+        return line;
+      }
+      
+      // Look for alphanumeric ID (at least 6 characters)
+      if (/^[A-Za-z0-9]{6,}$/.test(line)) {
+        return line;
+      }
+    }
+    
+    // If single line and looks like an ID, use it
+    if (lines.length === 1 && lines[0].length > 5) {
+      return lines[0];
     }
     
     return null;
   };
 
-  const handleScanResult = useCallback((decodedText, decodedResult) => {
-    console.log('Html5QrCode scan result:', decodedText);
-    console.log('Decoded result object:', decodedResult);
+  const handleScanResult = (decodedText, decodedResult) => {
+    console.log('Scan result:', decodedText);
     
-    let scannedId;
+    // Prevent duplicate scans
+    if (decodedText === lastScanned) return;
+    setLastScanned(decodedText);
+    
+    let ticketId;
     try {
-      scannedId = parseTicketId(decodedText);
+      ticketId = parseTicketId(decodedText);
       
-      if (!scannedId) {
+      if (!ticketId) {
         throw new Error("Could not extract ticket ID from QR code");
       }
-    } catch (e) {
-      console.error('QR parsing error:', e);
+    } catch (error) {
+      console.error('QR parsing error:', error);
       setStatus('error');
       setMessage(`INVALID QR CODE: Could not parse ticket ID. ${debugMode ? 'Raw: ' + decodedText.substring(0, 50) + '...' : ''}`);
       setTimeout(() => {
         setStatus('idle');
         setMessage(`Ready to scan for: ${eventName}`);
+        setLastScanned(null);
       }, 3500);
       return;
     }
     
-    if (scannedId === lastScanned) return;
-    setLastScanned(scannedId);
+    console.log('Parsed ticket ID:', ticketId);
+    console.log('Is valid?', validEventTickets.has(ticketId));
     
-    console.log('Parsed ticket ID:', scannedId);
-    console.log('Valid tickets:', Array.from(validEventTickets));
-    console.log('Is valid?', validEventTickets.has(scannedId));
-    
-    if (scannedCodes.has(scannedId)) {
+    // Check ticket validity
+    if (scannedCodes.has(ticketId)) {
       setStatus('warning');
-      setMessage(`ALREADY SCANNED: Ticket ${scannedId.substring(0,8)}... has already been checked in.`);
-    } else if (validEventTickets.has(scannedId)) {
+      setMessage(`ALREADY SCANNED: Ticket ${ticketId.substring(0,8)}... has already been checked in.`);
+    } else if (validEventTickets.has(ticketId)) {
       setStatus('success');
-      setMessage(`SUCCESS: Welcome! Ticket ${scannedId.substring(0,8)}... is valid.`);
-      setScannedCodes(prev => new Set(prev.add(scannedId)));
+      setMessage(`SUCCESS: Welcome! Ticket ${ticketId.substring(0,8)}... is valid.`);
+      setScannedCodes(prev => new Set(prev.add(ticketId)));
     } else {
       setStatus('error');
-      setMessage(`INVALID TICKET: Code ${scannedId.substring(0,8)}... is not for this event.`);
+      setMessage(`INVALID TICKET: Code ${ticketId.substring(0,8)}... is not for this event.`);
     }
     
+    // Reset after 3.5 seconds
     setTimeout(() => {
       setStatus('idle');
-      setLastScanned(null);
       setMessage(`Ready to scan for: ${eventName}`);
+      setLastScanned(null);
     }, 3500);
-  }, [lastScanned, scannedCodes, validEventTickets, eventName, debugMode]);
+  };
 
-  const handleScanError = useCallback((error) => {
-    console.error('QR Scanner Error:', error);
-    // Don't show error for every scan attempt failure
-    if (error.includes('QR code parse error')) {
-      // This is normal when camera is moving or no QR code is visible
-      return;
+  const handleScanError = (error) => {
+    // Only log actual errors, not routine scan attempts
+    if (error.includes('NotFoundError') || error.includes('No QR code found')) {
+      return; // Ignore these common non-errors
     }
-    setMessage('Scanner error: ' + error);
-    setStatus('error');
-  }, []);
+    console.warn('QR Scanner Error:', error);
+  };
 
-  const initializeScanner = useCallback(() => {
-    if (html5QrcodeScanner.current) {
-      html5QrcodeScanner.current.clear();
-    }
-
+  // Initialize scanner
+  useEffect(() => {
+    if (!isReady) return;
+    
     const config = {
       fps: 10,
       qrbox: { width: 250, height: 250 },
       aspectRatio: 1.0,
       disableFlip: false,
-      supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
-      formatsToSupport: [
-        // Support common QR code formats
-        'QR_CODE',
-        'DATA_MATRIX',
-        'AZTEC',
-        'CODE_128',
-        'CODE_39',
-        'CODE_93',
-        'CODABAR',
-        'EAN_13',
-        'EAN_8',
-        'UPC_A',
-        'UPC_E'
-      ],
-      showTorchButtonIfSupported: true,
-      showZoomSliderIfSupported: true,
-      defaultZoomValueIfSupported: 1,
+      facingMode: "environment"
     };
-
+    
     html5QrcodeScanner.current = new Html5QrcodeScanner(
       "qr-reader",
       config,
-      /* verbose= */ false
+      false
     );
-
+    
     html5QrcodeScanner.current.render(handleScanResult, handleScanError);
-    setIsScanning(true);
-  }, [handleScanResult, handleScanError]);
-
-  const stopScanner = useCallback(() => {
-    if (html5QrcodeScanner.current) {
-      html5QrcodeScanner.current.clear().catch(console.error);
-      html5QrcodeScanner.current = null;
-    }
-    setIsScanning(false);
-  }, []);
+    
+    // Cleanup function
+    return () => {
+      if (html5QrcodeScanner.current) {
+        html5QrcodeScanner.current.clear().catch(console.error);
+      }
+    };
+  }, [isReady, eventName]);
 
   useEffect(() => {
     loadEventData();
   }, [loadEventData]);
 
-  useEffect(() => {
-    if (isReady && !isScanning) {
-      initializeScanner();
-    }
-
-    return () => {
-      stopScanner();
-    };
-  }, [isReady, initializeScanner, stopScanner, isScanning]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      stopScanner();
-    };
-  }, [stopScanner]);
-
   if (isLoading) {
-    return <div className="scanner-container loading"><h2>Loading Event Data...</h2></div>;
+    return (
+      <div className="scanner-container loading">
+        <div className="result-panel">
+          <h2>Loading Event Data...</h2>
+        </div>
+      </div>
+    );
   }
   
   if (!isReady) {
@@ -324,7 +245,9 @@ const ScannerPage = () => {
       <div className="scanner-container error">
         <div className="result-panel">
           <p className="result-message">{message}</p>
-          <button onClick={loadEventData} className="retry-btn">Retry Connection</button>
+          <button onClick={loadEventData} className="retry-btn">
+            Retry Connection
+          </button>
           <div style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
             <p>Debug Info:</p>
             <p>Event ID: {eventId}</p>
@@ -349,7 +272,8 @@ const ScannerPage = () => {
             backgroundColor: debugMode ? '#007bff' : '#ccc',
             color: debugMode ? 'white' : 'black',
             border: 'none',
-            borderRadius: '3px'
+            borderRadius: '3px',
+            cursor: 'pointer'
           }}
         >
           {debugMode ? 'Debug ON' : 'Debug OFF'}
@@ -378,7 +302,8 @@ const ScannerPage = () => {
             backgroundColor: '#f5f5f5', 
             borderRadius: '5px',
             fontSize: '12px',
-            wordBreak: 'break-all'
+            wordBreak: 'break-all',
+            color: '#333'
           }}>
             <strong>Last Raw Scan:</strong><br />
             {lastRawScan}
