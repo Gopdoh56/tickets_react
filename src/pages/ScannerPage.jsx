@@ -35,8 +35,7 @@ const ScannerPage = () => {
     
     try {
       setMessage('Downloading fresh event data...');
-      const apiUrl = `${API_URL}/api/tickets/event/${eventId}/valid-ids/?token=${token}`;
-      
+      const apiUrl = `${API_URL}/api/tickets/valid-ids/${eventId}/?token=${token}`;
       console.log('Attempting to fetch from:', apiUrl);
       console.log('Event ID:', eventId);
       console.log('Token:', token);
