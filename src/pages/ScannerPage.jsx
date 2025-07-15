@@ -20,6 +20,8 @@ const ScannerPage = () => {
   const [validEventTickets, setValidEventTickets] = useState(new Set());
   const [isReady, setIsReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [debugMode, setDebugMode] = useState(false);
+  const [lastRawScan, setLastRawScan] = useState('');
 
   const loadEventData = useCallback(async () => {
     setIsLoading(true);
@@ -109,24 +111,93 @@ const ScannerPage = () => {
     loadEventData();
   }, [loadEventData]);
 
+  const parseTicketId = (qrContent) => {
+    // Store raw scan for debugging
+    setLastRawScan(qrContent);
+    
+    // Try multiple parsing methods
+    console.log('Raw QR Content:', qrContent);
+    
+    // Method 1: Look for TicketID: prefix (original method)
+    const lines = qrContent.split('\n');
+    const idLine = lines.find(line => line.startsWith('TicketID:'));
+    if (idLine) {
+      const ticketId = idLine.split(':')[1]?.trim();
+      console.log('Found TicketID with prefix:', ticketId);
+      return ticketId;
+    }
+    
+    // Method 2: Check if the entire content is just a ticket ID
+    const trimmedContent = qrContent.trim();
+    if (trimmedContent && !trimmedContent.includes('\n') && !trimmedContent.includes(' ')) {
+      console.log('Treating entire content as ticket ID:', trimmedContent);
+      return trimmedContent;
+    }
+    
+    // Method 3: Look for any line that might be a ticket ID (UUID-like format)
+    const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+    for (const line of lines) {
+      const match = line.match(uuidPattern);
+      if (match) {
+        console.log('Found UUID-like ticket ID:', match[0]);
+        return match[0];
+      }
+    }
+    
+    // Method 4: Look for any alphanumeric string that could be a ticket ID
+    const alphanumericPattern = /^[A-Za-z0-9]{8,}$/;
+    for (const line of lines) {
+      const cleanLine = line.trim();
+      if (alphanumericPattern.test(cleanLine)) {
+        console.log('Found alphanumeric ticket ID:', cleanLine);
+        return cleanLine;
+      }
+    }
+    
+    // Method 5: Try to extract from JSON if it's JSON format
+    try {
+      const jsonData = JSON.parse(qrContent);
+      if (jsonData.ticketId) {
+        console.log('Found ticket ID in JSON:', jsonData.ticketId);
+        return jsonData.ticketId;
+      }
+      if (jsonData.id) {
+        console.log('Found ID in JSON:', jsonData.id);
+        return jsonData.id;
+      }
+    } catch (e) {
+      // Not JSON, continue
+    }
+    
+    return null;
+  };
+
   const handleScanResult = (result) => {
     if (!result) return;
     
+    console.log('Scanner result:', result);
+    
     let scannedId;
     try {
-      const lines = result.split('\n');
-      const idLine = lines.find(line => line.startsWith('TicketID:'));
-      if (!idLine) throw new Error("Invalid QR code format");
-      scannedId = idLine.split(':')[1];
+      scannedId = parseTicketId(result);
+      
+      if (!scannedId) {
+        throw new Error("Could not extract ticket ID from QR code");
+      }
     } catch (e) {
+      console.error('QR parsing error:', e);
       setStatus('error');
-      setMessage('INVALID QR CODE: This is not a valid event ticket.');
+      setMessage(`INVALID QR CODE: Could not parse ticket ID. ${debugMode ? 'Raw: ' + result.substring(0, 50) + '...' : ''}`);
       setTimeout(() => setStatus('idle'), 3500);
       return;
     }
     
     if (scannedId === lastScanned) return;
     setLastScanned(scannedId);
+    
+    console.log('Parsed ticket ID:', scannedId);
+    console.log('Valid tickets:', Array.from(validEventTickets));
+    console.log('Is valid?', validEventTickets.has(scannedId));
     
     if (scannedCodes.has(scannedId)) {
       setStatus('warning');
@@ -178,6 +249,20 @@ const ScannerPage = () => {
     <div className={`scanner-container ${status}`}>
       <div className="scanner-header">
         Scanning for: <strong>{eventName}</strong>
+        <button 
+          onClick={() => setDebugMode(!debugMode)}
+          style={{ 
+            marginLeft: '10px', 
+            padding: '2px 6px', 
+            fontSize: '10px',
+            backgroundColor: debugMode ? '#007bff' : '#ccc',
+            color: debugMode ? 'white' : 'black',
+            border: 'none',
+            borderRadius: '3px'
+          }}
+        >
+          {debugMode ? 'Debug ON' : 'Debug OFF'}
+        </button>
       </div>
       <div className="scanner-viewfinder">
         <Scanner
@@ -202,6 +287,19 @@ const ScannerPage = () => {
         <div className="scanned-count">
           Checked In: {scannedCodes.size} | Total Valid: {validEventTickets.size}
         </div>
+        {debugMode && lastRawScan && (
+          <div style={{ 
+            marginTop: '10px', 
+            padding: '10px', 
+            backgroundColor: '#f5f5f5', 
+            borderRadius: '5px',
+            fontSize: '12px',
+            wordBreak: 'break-all'
+          }}>
+            <strong>Last Raw Scan:</strong><br />
+            {lastRawScan}
+          </div>
+        )}
       </div>
     </div>
   );
