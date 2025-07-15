@@ -1,124 +1,123 @@
 // src/pages/ScannerPage.jsx
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom'; // <-- 1. Import useParams and Link
-import { QrReader } from 'react-qr-reader';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { QrScanner } from '@yudiel/react-qr-scanner';
 import axios from 'axios';
 import './ScannerPage.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const ScannerPage = () => {
-  // --- 2. Get the eventId dynamically from the URL ---
-  const { eventId } = useParams(); 
-
+  const { eventId } = useParams();
+  const [searchParams] = useSearchParams();
+  
   const [eventName, setEventName] = useState('');
   const [lastScanned, setLastScanned] = useState(null);
-  const [status, setStatus] = useState('idle'); // 'idle', 'success', 'error', 'warning'
+  const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('Point camera at a ticket QR code.');
-  
-  // Use a Set for efficient 'lookup' operations
   const [scannedCodes, setScannedCodes] = useState(new Set());
   const [validEventTickets, setValidEventTickets] = useState(new Set());
-  
   const [isReady, setIsReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // This function now loads data for the specific eventId from the URL
   const loadEventData = useCallback(async () => {
     setIsLoading(true);
-    // Use a unique key for local storage for each event
+    const token = searchParams.get('token');
     const storageKey = `event_data_${eventId}`;
+
+    if (!token) {
+      setMessage("Access token missing. This page cannot be accessed directly.");
+      setIsLoading(false);
+      setIsReady(false);
+      return;
+    }
     
     try {
-      // Always try to fetch fresh data if online
-      setMessage('Downloading event data...');
-      
-      // NOTE: This API call needs to be authenticated!
-      // You'll need to send a JWT token in the headers for a real app.
-      const response = await axios.get(`${API_URL}/api/tickets/event/${eventId}/valid-ids/`);
-      
-      const { valid_ticket_ids, event_name } = response.data; // Assume backend also sends event name
+      setMessage('Downloading fresh event data...');
+      const response = await axios.get(`${API_URL}/api/tickets/event/${eventId}/valid-ids/?token=${token}`);
+      const { event_name, valid_ticket_ids } = response.data;
       
       const newValidTickets = new Set(valid_ticket_ids);
       
       // Save fresh data to local storage for offline use
       localStorage.setItem(storageKey, JSON.stringify({
         eventName: event_name,
-        validTicketIds: ticket_ids_as_strings
+        validTicketIds: valid_ticket_ids,
       }));
       
       setValidEventTickets(newValidTickets);
       setEventName(event_name);
       setMessage(`Ready to scan for: ${event_name}`);
+      setIsReady(true);
 
     } catch (error) {
-      // If fetching fails (e.g., offline), try to use stale data from local storage
-      console.warn("API fetch failed, attempting to load from local storage.", error);
+      console.warn("API fetch failed. Trying to load from offline storage.", error.response?.data?.error);
       const storedData = localStorage.getItem(storageKey);
       if (storedData) {
         const { eventName: storedEventName, validTicketIds: storedTicketIds } = JSON.parse(storedData);
         setValidEventTickets(new Set(storedTicketIds));
         setEventName(storedEventName);
-        setMessage(`Offline Mode: Ready to scan for ${storedEventName}`);
+        setMessage(`OFFLINE MODE: Ready to scan for ${storedEventName}`);
+        setIsReady(true);
       } else {
-        setMessage(`Error: Could not load data for Event ID ${eventId}. Please connect to the internet and refresh.`);
+        setMessage(`Error: ${error.response?.data?.error || 'Could not load data.'} Please connect to the internet and refresh.`);
         setIsReady(false);
       }
     } finally {
-      setIsReady(true);
       setIsLoading(false);
     }
-  }, [eventId]); // Re-run if the eventId in the URL changes
+  }, [eventId, searchParams]);
 
   useEffect(() => {
     loadEventData();
   }, [loadEventData]);
 
-
-  const handleScanResult = (result, error) => {
+  const handleScanResult = (result) => {
     if (!!result) {
       let scannedId;
       try {
-        // Your QR code data is multi-line, so we need to parse it
-        const lines = result.text.split('\n');
+        const lines = result.split('\n');
         const idLine = lines.find(line => line.startsWith('TicketID:'));
-        if (!idLine) throw new Error("Invalid QR code format");
+        if (!idLine) {
+          throw new Error("Invalid QR code format");
+        }
         scannedId = idLine.split(':')[1];
       } catch (e) {
         setStatus('error');
-        setMessage('INVALID QR CODE: This code is not a valid event ticket.');
+        setMessage('INVALID QR CODE: This is not a valid event ticket.');
         return;
       }
       
-      // Prevent immediate re-scan of the same code
       if (scannedId === lastScanned) return;
       setLastScanned(scannedId);
       
-      // Perform the check
       if (scannedCodes.has(scannedId)) {
-        setStatus('warning'); // Orange for already used
+        setStatus('warning');
         setMessage(`ALREADY SCANNED: Ticket ${scannedId.substring(0,8)}... has already been checked in.`);
       } else if (validEventTickets.has(scannedId)) {
-        setStatus('success'); // Green for valid
+        setStatus('success');
         setMessage(`SUCCESS: Welcome! Ticket ${scannedId.substring(0,8)}... is valid.`);
         setScannedCodes(prev => new Set(prev.add(scannedId)));
       } else {
-        setStatus('error'); // Red for invalid
-        setMessage(`INVALID TICKET: Code ${scannedId.substring(0,8)}... is not valid for this event.`);
+        setStatus('error');
+        setMessage(`INVALID TICKET: Code ${scannedId.substring(0,8)}... is not for this event or has been cancelled.`);
       }
       
-      // Reset the status message/color after a few seconds
       setTimeout(() => {
         setStatus('idle');
-
+        setLastScanned(null);
         setMessage(`Ready to scan for: ${eventName}`);
-      }, 3000);
+      }, 3500);
     }
   };
 
+  const handleError = (error) => {
+    console.error('QR Scanner Error:', error);
+  };
+
   if (isLoading) {
-    return <div className="scanner-container loading">Loading Event Data...</div>;
+    return <div className="scanner-container loading"><h2>Loading Event Data...</h2></div>;
   }
   
   if (!isReady) {
@@ -126,7 +125,7 @@ const ScannerPage = () => {
       <div className="scanner-container error">
         <div className="result-panel">
           <p className="result-message">{message}</p>
-          <button onClick={loadEventData} className="retry-btn">Retry</button>
+          <button onClick={loadEventData} className="retry-btn">Retry Connection</button>
         </div>
       </div>
     );
@@ -135,26 +134,31 @@ const ScannerPage = () => {
   return (
     <div className={`scanner-container ${status}`}>
       <div className="scanner-header">
-        Scanning for: <strong>{eventName || `Event ID: ${eventId}`}</strong>
+        Scanning for: <strong>{eventName}</strong>
       </div>
       <div className="scanner-viewfinder">
-        <QrReader
-          onResult={handleScanResult}
-          constraints={{ facingMode: 'environment' }}
-          containerStyle={{ width: '100%', paddingTop: '75%' }} // Aspect ratio fix for some devices
-          videoContainerStyle={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}
+        <QrScanner
+          onDecode={handleScanResult}
+          onError={handleError}
+          constraints={{
+            facingMode: 'environment'
+          }}
+          containerStyle={{ width: '100%' }}
         />
-        <div className="scanner-overlay"></div>
+        <div className="scanner-overlay">
+          <div className="scanner-box"></div>
+        </div>
       </div>
       <div className="result-panel">
         <div className={`status-icon ${status}`}>
           {status === 'success' && '✓'}
           {status === 'error' && '✗'}
-          {status === 'warning' && ' L'}
+          {status === 'warning' && '!'}
+          {status === 'idle' && '📷'}
         </div>
         <p className="result-message">{message}</p>
         <div className="scanned-count">
-          Checked In: {scannedCodes.size} / {validEventTickets.size}
+          Checked In: {scannedCodes.size} | Total Valid: {validEventTickets.size}
         </div>
       </div>
     </div>
