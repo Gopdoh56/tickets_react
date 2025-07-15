@@ -1,7 +1,5 @@
-// src/pages/ScannerPage.jsx
-
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { QrScanner } from '@yudiel/react-qr-scanner';
 import axios from 'axios';
 import './ScannerPage.css';
@@ -11,6 +9,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const ScannerPage = () => {
   const { eventId } = useParams();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   
   const [eventName, setEventName] = useState('');
   const [lastScanned, setLastScanned] = useState(null);
@@ -21,13 +20,29 @@ const ScannerPage = () => {
   const [isReady, setIsReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Debug information
+  console.log('DEBUG: Current location:', location);
+  console.log('DEBUG: Event ID from params:', eventId);
+  console.log('DEBUG: Search params:', Object.fromEntries(searchParams));
+  console.log('DEBUG: Token from search params:', searchParams.get('token'));
+
   const loadEventData = useCallback(async () => {
+    console.log('DEBUG: Loading event data for eventId:', eventId);
     setIsLoading(true);
     const token = searchParams.get('token');
     const storageKey = `event_data_${eventId}`;
 
     if (!token) {
+      console.error('DEBUG: No token found in search params');
       setMessage("Access token missing. This page cannot be accessed directly.");
+      setIsLoading(false);
+      setIsReady(false);
+      return;
+    }
+
+    if (!eventId) {
+      console.error('DEBUG: No eventId found in URL params');
+      setMessage("Event ID is missing from the URL.");
       setIsLoading(false);
       setIsReady(false);
       return;
@@ -35,7 +50,12 @@ const ScannerPage = () => {
     
     try {
       setMessage('Downloading fresh event data...');
-      const response = await axios.get(`${API_URL}/api/tickets/event/${eventId}/valid-ids/?token=${token}`);
+      const apiUrl = `${API_URL}/api/tickets/event/${eventId}/valid-ids/?token=${token}`;
+      console.log('DEBUG: Making API request to:', apiUrl);
+      
+      const response = await axios.get(apiUrl);
+      console.log('DEBUG: API response:', response.data);
+      
       const { event_name, valid_ticket_ids } = response.data;
       
       const newValidTickets = new Set(valid_ticket_ids);
@@ -52,16 +72,25 @@ const ScannerPage = () => {
       setIsReady(true);
 
     } catch (error) {
+      console.error("DEBUG: API fetch failed:", error);
       console.warn("API fetch failed. Trying to load from offline storage.", error.response?.data?.error);
+      
       const storedData = localStorage.getItem(storageKey);
       if (storedData) {
-        const { eventName: storedEventName, validTicketIds: storedTicketIds } = JSON.parse(storedData);
-        setValidEventTickets(new Set(storedTicketIds));
-        setEventName(storedEventName);
-        setMessage(`OFFLINE MODE: Ready to scan for ${storedEventName}`);
-        setIsReady(true);
+        try {
+          const { eventName: storedEventName, validTicketIds: storedTicketIds } = JSON.parse(storedData);
+          setValidEventTickets(new Set(storedTicketIds));
+          setEventName(storedEventName);
+          setMessage(`OFFLINE MODE: Ready to scan for ${storedEventName}`);
+          setIsReady(true);
+        } catch (parseError) {
+          console.error('DEBUG: Error parsing stored data:', parseError);
+          setMessage('Error loading stored data. Please refresh and try again.');
+          setIsReady(false);
+        }
       } else {
-        setMessage(`Error: ${error.response?.data?.error || 'Could not load data.'} Please connect to the internet and refresh.`);
+        const errorMessage = error.response?.data?.error || error.message || 'Could not load data.';
+        setMessage(`Error: ${errorMessage} Please connect to the internet and refresh.`);
         setIsReady(false);
       }
     } finally {
@@ -70,6 +99,7 @@ const ScannerPage = () => {
   }, [eventId, searchParams]);
 
   useEffect(() => {
+    console.log('DEBUG: useEffect triggered, calling loadEventData');
     loadEventData();
   }, [loadEventData]);
 
@@ -116,8 +146,20 @@ const ScannerPage = () => {
     console.error('QR Scanner Error:', error);
   };
 
+  // Show debug info at the top when loading
   if (isLoading) {
-    return <div className="scanner-container loading"><h2>Loading Event Data...</h2></div>;
+    return (
+      <div className="scanner-container loading">
+        <h2>Loading Event Data...</h2>
+        <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f0f0f0', fontSize: '12px' }}>
+          <strong>Debug Info:</strong><br/>
+          Event ID: {eventId || 'MISSING'}<br/>
+          Token: {searchParams.get('token') || 'MISSING'}<br/>
+          Current Path: {location.pathname}<br/>
+          Full URL: {window.location.href}
+        </div>
+      </div>
+    );
   }
   
   if (!isReady) {
@@ -126,6 +168,13 @@ const ScannerPage = () => {
         <div className="result-panel">
           <p className="result-message">{message}</p>
           <button onClick={loadEventData} className="retry-btn">Retry Connection</button>
+          <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f0f0f0', fontSize: '12px' }}>
+            <strong>Debug Info:</strong><br/>
+            Event ID: {eventId || 'MISSING'}<br/>
+            Token: {searchParams.get('token') || 'MISSING'}<br/>
+            Current Path: {location.pathname}<br/>
+            Full URL: {window.location.href}
+          </div>
         </div>
       </div>
     );
@@ -135,6 +184,9 @@ const ScannerPage = () => {
     <div className={`scanner-container ${status}`}>
       <div className="scanner-header">
         Scanning for: <strong>{eventName}</strong>
+        <div style={{ fontSize: '10px', color: '#666' }}>
+          Event ID: {eventId} | Token: {searchParams.get('token')?.substring(0, 8)}...
+        </div>
       </div>
       <div className="scanner-viewfinder">
         <QrScanner
