@@ -3,131 +3,124 @@
 .scanner-container {
   width: 100vw;
   height: 100vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   background-color: #000;
   color: white;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.4s ease-in-out;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
-/* Status background colors */
-.scanner-container.success { background-color: #2e7d32; }
-.scanner-container.error { background-color: #c62828; }
-.scanner-container.warning { background-color: #ef6c00; }
-.scanner-container.loading { background-color: #1a1a1a; }
+/* Status background colors for instant feedback */
+.scanner-container.success { background-color: #1a4d2e; } /* Dark Green */
+.scanner-container.error { background-color: #6a040f; }   /* Dark Red */
+.scanner-container.warning { background-color: #b45309; } /* Dark Orange */
 
 .scanner-header {
-  padding: 15px 20px;
-  background-color: #1a1a1a;
-  border-bottom: 2px solid #333;
+  padding: 10px 15px;
+  background-color: rgba(0, 0, 0, 0.3);
   text-align: center;
-  font-size: 1.1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  font-size: 1rem;
+  z-index: 10;
+  position: relative;
 }
 
 .scanner-viewfinder {
-  flex: 1;
+  flex-grow: 1; /* Takes up all remaining space */
   position: relative;
   overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background-color: #111;
 }
 
-/* Override html5-qrcode styles */
+/* This is the div that html5-qrcode will use */
 #qr-reader {
-  border: none !important;
-  width: 100% !important;
+  width: 100%;
+  height: 100%;
+  border: none;
 }
-
-#qr-reader > div {
-  border: none !important;
-}
-
 #qr-reader video {
-  border-radius: 8px !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-/* Hide the file input and camera selection from html5-qrcode */
-#qr-reader select,
-#qr-reader input[type="file"],
-#qr-reader button {
-  display: none !important;
+.scanner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.scanner-box {
+  width: 250px;
+  height: 250px;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.5); /* This creates the dark overlay effect */
+  border-radius: 12px;
 }
 
 .result-panel {
   padding: 20px;
   text-align: center;
-  background-color: #1a1a1a;
-  border-top: 2px solid #333;
-  min-height: 160px;
-}
-
-.status-icon {
-  font-size: 4rem;
-  font-weight: bold;
-  height: 80px;
+  background-color: #1c1c1c;
+  border-top: 1px solid #333;
+  z-index: 10;
+  position: relative;
+  min-height: 150px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
 }
 
-.status-icon.success { color: #66bb6a; }
-.status-icon.error { color: #ef5350; }
-.status-icon.warning { color: #ffa726; }
-.status-icon.idle { color: #90a4ae; }
+.status-icon {
+  font-size: 3rem;
+  font-weight: bold;
+  height: 60px;
+  line-height: 60px;
+  transition: color 0.3s ease;
+}
+.status-icon.idle { color: #ccc; }
+.status-icon.success { color: #4ade80; } /* Bright Green */
+.status-icon.error { color: #f87171; }   /* Bright Red */
+.status-icon.warning { color: #fb923c; } /* Bright Orange */
 
 .result-message {
-  font-size: 1.2rem;
-  min-height: 50px;
+  font-size: 1.1rem;
+  min-height: 40px;
   font-weight: 500;
-  margin: 10px 0;
+  margin: 5px 0 10px 0;
 }
 
 .scanned-count {
-  margin-top: 15px;
+  font-size: 0.9rem;
   color: #888;
-  font-size: 0.95rem;
+}
+
+/* Styles for loading and error states before the scanner is ready */
+.scanner-container.loading,
+.scanner-container.error {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
 }
 
 .retry-btn {
-  padding: 12px 24px;
-  background-color: #007bff;
+  margin-top: 20px;
+  padding: 12px 25px;
+  border: 1px solid white;
+  background-color: transparent;
   color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  border-radius: 8px;
   font-size: 1rem;
-  margin-top: 10px;
-  transition: background-color 0.3s ease;
-}
-
-.retry-btn:hover {
-  background-color: #0056b3;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .scanner-header {
-    font-size: 1rem;
-    padding: 10px 15px;
-  }
-  
-  .result-panel {
-    padding: 15px;
-    min-height: 140px;
-  }
-  
-  .status-icon {
-    font-size: 3rem;
-    height: 60px;
-  }
-  
-  .result-message {
-    font-size: 1.1rem;
-  }
+  font-weight: bold;
+  cursor: pointer;
 }
