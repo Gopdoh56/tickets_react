@@ -124,3 +124,26 @@
   font-weight: bold;
   cursor: pointer;
 }
+
+
+#qr-reader {
+  position: relative;
+  border: none !important; /* Override any default borders */
+}
+
+/* Hide the "Scan an image file" button and its container */
+#qr-reader__dashboard_section_csr {
+  display: none !important;
+}
+
+/* Hide the "powered by" footer if it appears */
+#qr-reader__footer {
+  display: none !important;
+}
+
+/* Ensure the video feed takes up the full space */
+#qr-reader video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
