@@ -19,16 +19,11 @@ const ScannerPage = () => {
   const [scannedCodes, setScannedCodes] = useState(new Set());
   const [validEventTickets, setValidEventTickets] = useState(new Set());
   const [isReady, setIsReady] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Manages the initial loading screen
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false); // New state for refresh indicator
 
-  // This is the new, more robust data loading function.
+  // Fixed data loading function
   const loadEventData = useCallback(async () => {
-    // We only show the full-page "Loading..." screen on the very first load.
-    // Subsequent refreshes will happen in the background.
-    if (!isReady) {
-      setIsLoading(true);
-    }
-
     const token = searchParams.get('token');
     const storageKey = `event_data_${eventId}`;
 
@@ -39,26 +34,30 @@ const ScannerPage = () => {
       return;
     }
 
-    // --- NEW "STALE-WHILE-REVALIDATE" STRATEGY ---
-
-    // Step 1: Immediately load from local storage to make the app ready fast.
+    // Step 1: Load from local storage if available (for fast initial display)
     const storedData = localStorage.getItem(storageKey);
+    let hasStoredData = false;
+    
     if (storedData) {
       try {
         const { eventName: storedEventName, validTicketIds: storedTicketIds } = JSON.parse(storedData);
         setValidEventTickets(new Set(storedTicketIds));
         setEventName(storedEventName);
-        setMessage(`Ready to scan for ${storedEventName} (using cached data)`);
-        setIsReady(true); // The scanner is now ready with potentially stale data
+        setMessage(`Ready to scan for ${storedEventName}`);
+        setIsReady(true);
+        setIsLoading(false); // Stop initial loading since we have cached data
+        hasStoredData = true;
       } catch (e) {
         console.error("Failed to parse stored data:", e);
-        localStorage.removeItem(storageKey); // Clear corrupted data
+        localStorage.removeItem(storageKey);
       }
     }
 
-    // Step 2: ALWAYS attempt to fetch fresh data from the server.
+    // Step 2: ALWAYS fetch fresh data from server
     try {
-      if (isReady) {
+      // Show appropriate loading message
+      if (hasStoredData) {
+        setIsRefreshing(true);
         setMessage(`Checking for updates for: ${eventName}...`);
       } else {
         setMessage('Downloading event data...');
@@ -70,7 +69,7 @@ const ScannerPage = () => {
       const { event_name, valid_ticket_ids } = response.data;
       const newValidTickets = new Set(valid_ticket_ids);
       
-      // Step 3: If the fetch is successful, update state and local storage.
+      // Step 3: Update with fresh data
       console.log("Successfully fetched fresh data. Scanner is now up-to-date.");
       localStorage.setItem(storageKey, JSON.stringify({
         eventName: event_name,
@@ -79,51 +78,81 @@ const ScannerPage = () => {
       
       setValidEventTickets(newValidTickets);
       setEventName(event_name);
-      setMessage(`Ready to scan for: ${event_name} (data updated)`);
-      setIsReady(true); // Ensure the app is marked as ready
+      setMessage(`Ready to scan for: ${event_name}`);
+      setIsReady(true);
 
     } catch (error) {
-      // If the API fetch fails, it's okay. The user can continue using the old data if it exists.
-      console.warn("Could not fetch fresh data. Continuing in offline/stale mode.", error.response?.data?.error);
+      console.warn("Could not fetch fresh data:", error.response?.data?.error);
       
-      if (!storedData) {
-        // Only show a critical error if there was no stored data to begin with.
+      if (!hasStoredData) {
+        // Critical error: no cached data and no fresh data
         const errorMessage = error.response?.data?.error || 'Could not load event data.';
         setMessage(`Error: ${errorMessage} Please check connection and refresh.`);
         setIsReady(false);
       } else {
-        // If we already loaded stale data, just update the message to inform the user.
-        setMessage(`OFFLINE MODE: Ready to scan for ${eventName}`);
+        // Non-critical error: we have cached data, just inform user
+        setMessage(`Ready to scan for ${eventName} (using cached data)`);
       }
     } finally {
-      // No matter what, the initial loading process is finished.
       setIsLoading(false);
+      setIsRefreshing(false);
     }
-  }, [eventId, searchParams]); // The `isReady` and `eventName` dependencies were removed to prevent loops
+  }, [eventId, searchParams]);
 
-  // This useEffect triggers the initial data load.
+  // Initial data load
   useEffect(() => {
     loadEventData();
-  }, [loadEventData]); // This will run once when the component mounts.
+  }, [loadEventData]);
+
+  // Add a manual refresh function
+  const handleRefresh = () => {
+    loadEventData();
+  };
 
   const handleScanSuccess = (decodedText, decodedResult) => {
-    // Your existing handleScanSuccess logic is perfect and does not need to change.
-    // It correctly uses the `validEventTickets` state, which is now being updated by `loadEventData`.
-    // ... (keep the entire function as is) ...
+    // Prevent duplicate scans
+    if (lastScannedId === decodedText) {
+      return;
+    }
+    
+    setLastScannedId(decodedText);
+    
+    // Check if this ticket is valid for this event
+    if (validEventTickets.has(decodedText)) {
+      if (scannedCodes.has(decodedText)) {
+        // Already scanned
+        setStatus('warning');
+        setMessage('⚠️ Ticket already scanned!');
+      } else {
+        // Valid and new scan
+        setScannedCodes(prev => new Set(prev).add(decodedText));
+        setStatus('success');
+        setMessage('✅ Valid ticket! Check-in successful.');
+      }
+    } else {
+      // Invalid ticket
+      setStatus('error');
+      setMessage('❌ Invalid ticket for this event.');
+    }
+    
+    // Clear the status after 3 seconds
+    setTimeout(() => {
+      setStatus('idle');
+      setMessage('Point camera at a ticket QR code.');
+    }, 3000);
   };
   
   const handleScanError = (errorMessage) => {
-    // This function is also fine as is.
+    // Only log errors, don't show them to user as they're usually just scanning issues
+    console.log("QR scan error:", errorMessage);
   };
 
-  // --- RENDER LOGIC ---
-
-  // Show a full-page loader only on the very first load.
+  // Show full-page loader only on initial load without cached data
   if (isLoading) {
     return <div className="scanner-container loading"><h2>Loading Event Data...</h2></div>;
   }
   
-  // Show an error state if data could not be loaded from either API or cache.
+  // Show error state if data could not be loaded
   if (!isReady) {
     return (
       <div className="scanner-container error">
@@ -135,11 +164,20 @@ const ScannerPage = () => {
     );
   }
 
-  // Once ready, show the main scanner interface.
+  // Main scanner interface
   return (
     <div className={`scanner-container ${status}`}>
       <div className="scanner-header">
-        Scanning for: <strong>{eventName}</strong>
+        <div>
+          Scanning for: <strong>{eventName}</strong>
+        </div>
+        <button 
+          onClick={handleRefresh} 
+          className="refresh-btn"
+          disabled={isRefreshing}
+        >
+          {isRefreshing ? 'Updating...' : 'Refresh'}
+        </button>
       </div>
       <div className="scanner-viewfinder">
         <QrScanner
@@ -161,6 +199,7 @@ const ScannerPage = () => {
         <div className="scanned-count">
           Checked In: {scannedCodes.size} | Total Valid: {validEventTickets.size}
         </div>
+        {isRefreshing && <div className="refresh-indicator">Updating ticket data...</div>}
       </div>
     </div>
   );
