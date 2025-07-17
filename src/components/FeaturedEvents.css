@@ -1,10 +1,8 @@
-/* ===================================================================
- * FILE: FeaturedEvents.css
- * DESC: Improved styles for the featured events section and event cards.
- * =================================================================== */
+/* src/components/FeaturedEvents.css */
 
 .featured-events {
-  padding: 4rem 0;
+  padding: 4rem 1rem; /* Added horizontal padding for mobile */
+  background-color: #121212;
 }
 
 .featured-events-header {
@@ -16,59 +14,32 @@
 
 .featured-events-title {
   font-size: 1.875rem;
-  font-weight: bold;
+  font-weight: 700;
   color: white;
   margin: 0;
 }
 
 .view-all-btn {
-  padding: 0.5rem 1rem;
-  background: transparent;
-  border: 1px solid #FF8552;
+  padding: 0.6rem 1.2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
-  border-radius: 0.375rem;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  font-weight: 500;
+  text-decoration: none; /* For the Link component */
+  transition: all 0.2s ease;
 }
 
 .view-all-btn:hover {
-  background: rgba(255, 133, 82, 0.2);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #FF8552;
 }
 
 .events-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 2rem;
-}
-
-@media (min-width: 768px) {
-  .events-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .events-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.event-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  border: 1px solid hsl(0, 0%, 100%);
-  border-radius: 0.75rem;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 380px;
-}
-
-.event-card:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-5px);
 }
 
 .event-card-link {
@@ -78,59 +49,45 @@
   height: 100%;
 }
 
-/* PERFECT IMAGE CONTAINER - IMPROVED */
+.event-card {
+  background: #1e1e1e;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.event-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  border-color: #FF8552;
+}
+
 .event-image-container {
   position: relative;
   width: 100%;
-  height: 240px;
+  aspect-ratio: 1 / 1;
+  background-color: #282828;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.1);
-  /* Ensure no gaps or spacing issues */
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-/* PERFECT IMAGE STYLING - IMPROVED */
 .event-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
-  transition: transform 0.3s ease;
-  display: block;
-  /* Ensure image covers the entire container */
-  min-width: 100%;
-  min-height: 100%;
-  /* Remove any default margins or padding */
-  margin: 0;
-  padding: 0;
-  /* Ensure crisp rendering */
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: optimize-contrast;
-  image-rendering: crisp-edges;
-  /* Fallback for older browsers */
-  -ms-interpolation-mode: bicubic;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .event-card:hover .event-image {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
-/* Fallback for images that fail to load */
-.event-image[src*="placeholder"] {
-  background: linear-gradient(135deg, rgba(255, 133, 82, 0.2), rgba(3, 181, 170, 0.2));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
-  text-align: center;
-}
-
-/* IMPROVED CONTENT SECTION */
 .event-content {
-  padding: 1.25rem;
+  padding: 1rem; /* Reduced padding */
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -138,171 +95,121 @@
 
 .event-title {
   font-size: 1.125rem;
-  font-weight: bold;
+  font-weight: 600;
   color: white;
   margin: 0 0 0.75rem 0;
-  transition: color 0.3s ease;
   line-height: 1.3;
+  min-height: 30px; /* Reserve space for two lines to prevent layout shift */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.event-card:hover .event-title {
-  color: #03B5AA;
-}
-
-/* COMPACT EVENT DETAILS */
+/* --- UPDATED COMPACT DETAILS STYLES --- */
 .event-details {
-  margin-bottom: 0.75rem;
-  flex-grow: 1;
+  display: flex;
+  flex-direction: column; /* Stack details vertically but make them more compact */
+  gap: 0.10rem; /* Reduced gap between date and venue */
+  margin-bottom: 1rem;
+  flex-grow: 1; /* Pushes the footer down */
 }
 
-.event-detail {
+.event-detail-item {
   display: flex;
   align-items: center;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 0.375rem;
-  font-size: 0.8rem;
+  color: #a0a0a0;
+  font-size: 0.75rem; /* Smaller font size */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Add '...' if text is too long */
 }
 
 .detail-icon {
-  margin-right: 0.375rem;
-  width: 0.875rem;
-  height: 0.875rem;
+  margin-right: 0.375rem; /* Reduced margin */
+  width: 12px; /* Smaller icon size */
+  height: 12px; /* Smaller icon size */
   flex-shrink: 0;
+  stroke-width: 2px;
 }
+
+/* Alternative: If you want date and location on the same line */
+.event-details-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem; /* Space between date and location */
+  margin-bottom: 1rem;
+  flex-grow: 1;
+}
+
+.event-detail-item-inline {
+  display: flex;
+  align-items: center;
+  color: #a0a0a0;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0; /* Allows flex items to shrink */
+}
+
+.detail-icon-inline {
+  margin-right: 0.25rem;
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  stroke-width: 2px;
+}
+/* --- END OF UPDATED STYLES --- */
 
 .event-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: auto;
-  padding-top: 0.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 0.75rem;
+  border-top: 1px solid #2a2a2a;
 }
 
 .event-price {
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: white;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #03B5AA;
 }
 
 .get-tickets-btn {
-  background: #FF8552;
+  background-color: #FF8552;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  text-align: center;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
   font-size: 0.875rem;
 }
 
 .get-tickets-btn:hover {
-  background: #E6784A;
-  transform: translateY(-1px);
+  background-color: #E6784A;
 }
 
-/* RESPONSIVE IMPROVEMENTS */
-@media (max-width: 768px) {
-  .event-card {
-    min-height: 340px;
-  }
-  
-  .event-image-container {
-    height: 200px;
-  }
-  
-  .event-content {
-    padding: 1rem;
-  }
-  
-  .event-title {
-    font-size: 1rem;
-  }
-  
-  .event-price {
-    font-size: 1.125rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .featured-events-header {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-  
-  .event-card {
-    min-height: 320px;
-  }
-  
-  .event-image-container {
-    height: 180px;
-  }
-  
-  .event-content {
-    padding: 0.875rem;
-  }
-  
-  .event-detail {
-    font-size: 0.75rem;
-  }
-  
-  .get-tickets-btn {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.8rem;
-  }
-}
-
-/* LOADING AND ERROR STATES */
-.loading-placeholder {
+/* Loading, Error, and No Events States */
+.loading-placeholder, .error-message, .no-events-found {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 200px;
-  color: rgba(255, 255, 255, 0.7);
+  min-height: 200px;
+  color: #888;
   font-size: 1.125rem;
+  padding: 2rem;
+  background-color: #1e1e1e;
+  border-radius: 12px;
 }
 
 .error-message {
   color: #ff6b6b;
-  text-align: center;
-  padding: 2rem;
-  background: rgba(255, 107, 107, 0.1);
-  border-radius: 0.5rem;
-  border: 1px solid rgba(255, 107, 107, 0.3);
 }
 
-/* ADDITIONAL IMAGE OPTIMIZATION */
-.event-image-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 133, 82, 0.1), rgba(3, 181, 170, 0.1));
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 1;
-}
-
-.event-card:hover .event-image-container::before {
-  opacity: 1;
-}
-
-/* Ensure images always fill the container perfectly */
-.event-image-container img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+.no-events-found p {
+    text-align: center;
 }

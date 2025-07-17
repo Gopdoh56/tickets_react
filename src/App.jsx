@@ -21,7 +21,7 @@ function App() {
       <Route path="/payment-success" element={<PaymentSuccessPage />} />
       <Route path="/recover-tickets" element={<TicketRecovery />} />
       <Route path="/my-tickets" element={<MyTicketsPage />} />
-      <Route path="/admin/upload" element={<AdminEventUpload />} />
+      <Route path="/admin/1234upload" element={<AdminEventUpload />} />
       
       {/* --- THIS IS THE MISSING LINE YOU NEED TO ADD --- */}
       {/* The ':eventId' part tells the router to match any value here */}

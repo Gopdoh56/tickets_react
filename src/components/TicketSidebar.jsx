@@ -3,21 +3,13 @@ import axios from 'axios';
 import './TicketSidebar.css';
 
 const TicketSidebar = ({ event }) => {
-  // --- THIS IS THE FIRST CHANGE ---
-  // This makes your component work in both local development and on Vercel
-  // by reading the environment variable provided by Vercel.
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-  // --- END OF CHANGE ---
 
-  // State to hold quantities for each ticket type
   const [quantities, setQuantities] = useState({});
-  // State for user's contact information
   const [userInfo, setUserInfo] = useState({ name: '', email: '', whatsapp: '' });
-  // State for loading and error messages
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Handler to change quantity for a specific ticket type
   const handleQuantityChange = (ticketTypeId, change) => {
     const currentQuantity = quantities[ticketTypeId] || 0;
     const newQuantity = currentQuantity + change;
@@ -29,13 +21,11 @@ const TicketSidebar = ({ event }) => {
     }
   };
 
-  // Handler for the user info input fields
   const handleUserInfoChange = (e) => {
     const { name, value } = e.target;
     setUserInfo(prev => ({ ...prev, [name]: value }));
   };
 
-  // Calculate total price and total items using useMemo for performance
   const { totalItems, totalPrice } = useMemo(() => {
     let items = 0;
     let price = 0;
@@ -52,10 +42,9 @@ const TicketSidebar = ({ event }) => {
     return { totalItems: items, totalPrice: price };
   }, [quantities, event.ticket_types]);
 
-  // Define your service fee
-  const serviceFee = 500.00;
+  // --- REMOVED THE SERVICE FEE CONSTANT ---
+  // const serviceFee = 500.00;
 
-  // The purchase handler now uses the dynamic API_URL
   const handlePurchase = async () => {
     if (totalItems === 0) {
       alert("Please select at least one ticket.");
@@ -82,22 +71,17 @@ const TicketSidebar = ({ event }) => {
     try {
       localStorage.setItem('purchaser_email', userInfo.email);
 
-      // --- THIS IS THE SECOND CHANGE ---
-      // The hardcoded 'localhost' URL has been replaced with the API_URL variable.
       const response = await axios.post(
         `${API_URL}/api/payments/initiate-payment/`, 
         purchaseDetails
       );
-      // --- END OF CHANGE ---
       
       const { payment_url } = response.data;
-
       if (payment_url) {
         window.location.href = payment_url;
       } else {
         setError('Could not retrieve payment link. Please try again.');
       }
-
     } catch (err) {
       const errorMessage = err.response?.data?.error || 'An unexpected error occurred during payment initiation.';
       setError(errorMessage);
@@ -107,7 +91,6 @@ const TicketSidebar = ({ event }) => {
     }
   };
 
-  // Determine if all ticket types are sold out
   const isSoldOut = event.ticket_types.every(t => t.available_quantity === 0);
 
   return (
@@ -135,27 +118,23 @@ const TicketSidebar = ({ event }) => {
                     <span className="ticket-type-name">{ticketType.name}</span>
                     <span className="ticket-type-price">K{Number(ticketType.price).toFixed(2)}</span>
                   </div>
-                  {ticketType.available_quantity > 0 ? (
-                    <div className="quantity-controls">
-                      <button 
-                        className="quantity-btn"
-                        onClick={() => handleQuantityChange(ticketType.id, -1)}
-                        disabled={!quantities[ticketType.id] || quantities[ticketType.id] <= 0}
-                      >
-                        -
-                      </button>
-                      <span className="quantity-display">{quantities[ticketType.id] || 0}</span>
-                      <button 
-                        className="quantity-btn"
-                        onClick={() => handleQuantityChange(ticketType.id, 1)}
-                        disabled={(quantities[ticketType.id] || 0) >= ticketType.available_quantity}
-                      >
-                        +
-                      </button>
-                    </div>
-                  ) : (
-                    <span className="ticket-type-soldout">Sold Out</span>
-                  )}
+                  <div className="quantity-controls">
+                    <button 
+                      className="quantity-btn"
+                      onClick={() => handleQuantityChange(ticketType.id, -1)}
+                      disabled={!quantities[ticketType.id] || quantities[ticketType.id] <= 0}
+                    >
+                      -
+                    </button>
+                    <span className="quantity-display">{quantities[ticketType.id] || 0}</span>
+                    <button 
+                      className="quantity-btn"
+                      onClick={() => handleQuantityChange(ticketType.id, 1)}
+                      disabled={(quantities[ticketType.id] || 0) >= ticketType.available_quantity}
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -163,50 +142,18 @@ const TicketSidebar = ({ event }) => {
             {totalItems > 0 && (
               <>
                 <div className="user-info-section">
-                  <h4 className="user-info-title">Your Details</h4>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Full Name"
-                    value={userInfo.name}
-                    onChange={handleUserInfoChange}
-                    className="user-input"
-                    required
-                  />
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email Address"
-                    value={userInfo.email}
-                    onChange={handleUserInfoChange}
-                    className="user-input"
-                    required
-                  />
-                  <input
-                    type="tel"
-                    name="whatsapp"
-                    placeholder="WhatsApp Number (e.g., +265...)"
-                    value={userInfo.whatsapp}
-                    onChange={handleUserInfoChange}
-                    className="user-input"
-                    required
-                  />
+                  {/* ... your user info inputs ... */}
                 </div>
 
+                {/* --- UPDATED TOTALS SECTION --- */}
                 <div className="total-section">
-                  <div className="total-row">
-                    <span>Subtotal ({totalItems} {totalItems === 1 ? 'item' : 'items'}):</span>
+                  {/* The subtotal is now the final total */}
+                  <div className="total-row total">
+                    <span>Total ({totalItems} {totalItems === 1 ? 'item' : 'items'}):</span>
                     <span>K{totalPrice.toFixed(2)}</span>
                   </div>
-                  <div className="total-row fees">
-                    <span>Service Fee:</span>
-                    <span>K{serviceFee.toFixed(2)}</span>
-                  </div>
-                  <div className="total-row total">
-                    <span>Total:</span>
-                    <span>K{(totalPrice + serviceFee).toFixed(2)}</span>
-                  </div>
                 </div>
+                {/* --- END OF UPDATED SECTION --- */}
               </>
             )}
 
