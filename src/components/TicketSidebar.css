@@ -70,12 +70,12 @@
 
 .ticket-type-name {
   font-weight: 600;
-  color: #1f2937;
+  color:rgb(254, 254, 255);
 }
 
 .ticket-type-price {
   font-size: 0.9rem;
-  color: #6b7280;
+  color:rgb(6, 84, 240);
 }
 
 .quantity-controls {
