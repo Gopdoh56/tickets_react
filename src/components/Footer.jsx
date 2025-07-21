@@ -13,21 +13,13 @@ const Footer = () => {
                   <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"></polygon>
                 </svg>
               </div>
-              <span className="footer-logo-text">EventHub</span>
+              <span className="footer-logo-text">EventPas</span>
             </div>
             <p className="footer-description">
               Your premier destination for discovering and booking amazing events.
             </p>
           </div>
 
-          <div className="footer-section">
-            <h3 className="footer-section-title">Quick Links</h3>
-            <ul className="footer-links">
-              <li><a href="#" className="footer-link">Browse Events</a></li>
-              <li><a href="#" className="footer-link">Create Event</a></li>
-              <li><a href="#" className="footer-link">Help Center</a></li>
-            </ul>
-          </div>
 
           <div className="footer-section">
             <h3 className="footer-section-title">Categories</h3>
@@ -42,15 +34,15 @@ const Footer = () => {
             <h3 className="footer-section-title">Support</h3>
             <ul className="footer-links">
               <li><a href="#" className="footer-link">Contact Us</a></li>
-              <li><a href="#" className="footer-link">Privacy Policy</a></li>
-              <li><a href="#" className="footer-link">Terms of Service</a></li>
+              <li><a href="#" className="footer-link">0991010388 ,manjawiragospel@gmail.com</a></li>
+              <li><a href="#" className="footer-link">Help Center</a></li>
             </ul>
           </div>
         </div>
 
         <div className="footer-bottom">
           <p className="footer-copyright">
-            © {new Date().getFullYear()} EventHub. All rights reserved.
+            © {new Date().getFullYear()} Eventpas. All rights reserved.
           </p>
         </div>
       </div>
